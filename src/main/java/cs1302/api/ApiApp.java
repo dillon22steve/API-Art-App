@@ -16,6 +16,7 @@ public class ApiApp extends Application {
     Stage stage;
     Scene scene;
     VBox root;
+    MetPane metPane;
 
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
@@ -23,6 +24,7 @@ public class ApiApp extends Application {
      */
     public ApiApp() {
         root = new VBox();
+        metPane = new MetPane();
     } // ApiApp
 
     /** {@inheritDoc} */
@@ -41,7 +43,7 @@ public class ApiApp extends Application {
         Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        root.getChildren().addAll(banner, notice);
+        root.getChildren().addAll(banner, metPane, notice);
         scene = new Scene(root);
 
         // setup stage
