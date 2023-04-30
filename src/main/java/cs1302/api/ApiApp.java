@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -17,6 +18,7 @@ public class ApiApp extends Application {
     Scene scene;
     VBox root;
     MetPane metPane;
+    ArtPane artPane;
 
     /**
      * Constructs an {@code ApiApp} object. This default (i.e., no argument)
@@ -25,6 +27,8 @@ public class ApiApp extends Application {
     public ApiApp() {
         root = new VBox();
         metPane = new MetPane();
+        metPane.apiApp = this;
+        artPane = new ArtPane();
     } // ApiApp
 
     /** {@inheritDoc} */
@@ -43,7 +47,8 @@ public class ApiApp extends Application {
         Label notice = new Label("Modify the starter code to suit your needs.");
 
         // setup scene
-        root.getChildren().addAll(banner, metPane, notice);
+        root.setSpacing(10);
+        root.getChildren().addAll(banner, metPane, artPane, notice);
         scene = new Scene(root);
 
         // setup stage
