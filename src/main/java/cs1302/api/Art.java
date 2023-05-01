@@ -11,16 +11,33 @@ import java.io.InputStream;
 import java.io.IOException;
 
 
+/**
+ * Art objects will be used to store data about each piece of art returned from a museum query.
+ */
 public class Art {
 
     public String title;
     public String artist;
     public String department;
     public String period;
+    public String country;
     public String imageUrl;
     public Image image;
 
-    public Art(String title, String artist, String department, String period, String imageUrl) {
+    /**
+     * Constructs an Art object that will store the art's data. The constructor will also call the
+     * fetchImage method which will create an Image object of the piece using the imageUrl.
+     *
+     * @param title the title of the piece.
+     * @param artist the artist who created the piece.
+     * @param department the department within the museum that the piece belongs to.
+     * @param period the time period that the piece was created in.
+     * @param country the country that the piece was created in.
+     * @param imageUrl the url for the image that will be used to created an Image object of the
+     */
+    public Art(String title, String artist, String department, String period, String country,
+        String imageUrl) {
+
         this.title = title;
         this.artist = artist;
         this.department = department;
@@ -34,6 +51,9 @@ public class Art {
 
 
 
+    /**
+     * Creates an image object of the art using the imageUrl.
+     */
     private void loadImage() {
         try {
             URI location = URI.create(this.imageUrl);
