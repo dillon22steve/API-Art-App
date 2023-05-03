@@ -30,7 +30,7 @@ public class ArtPane extends HBox {
 
         initArtView();
 
-        artInfoPane = new ArtInfoPane();
+        artInfoPane = new ArtInfoPane(apiApp);
         artInfoPane.apiApp = this.apiApp;
 
         addToPane();

@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
+import javafx.scene.image.Image;
 import javafx.geometry.Insets;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
@@ -25,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
+import java.io.InputStream;
 
 
 /**
@@ -36,13 +38,14 @@ public class MetPane extends HBox {
 
     //This index will be used to determine which Art object will be displayed to the user when they
     //click the "Next Piece" or "Previous Piece" buttons.
-    private static int DISPLAYED_ART_INDEX = 0;
+    protected static int DISPLAYED_ART_INDEX = 0;
 
     private Button search;
     private ComboBox<String> dropDown;
     private Label testLabel;
     private TextField searchBar;
     private ArrayList<Art> artArray;
+    private ArrayList<Art> articArtArray;
     protected ApiApp apiApp;
 
     public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
@@ -63,6 +66,7 @@ public class MetPane extends HBox {
         this.search = new Button("Search");
         this.searchBar = new TextField("Type an artist, or any other search term.");
         this.artArray = new ArrayList<Art>();
+        this.articArtArray = new ArrayList<Art>();
 
         initDropDown();
         initHandlers();
@@ -96,6 +100,7 @@ public class MetPane extends HBox {
         EventHandler<ActionEvent> searchHandler = (ActionEvent e) -> {
             String term = searchBar.getText().trim();
             String filter = dropDown.getValue();
+            search.setDisable(true);
             HelperMethods.runNow( () -> searchMet(term, filter));
             //searchArtic();
         };
@@ -132,8 +137,7 @@ public class MetPane extends HBox {
 
             String jsonString = response.body();
 
-            MetResponse metResponse = gson
-                .fromJson(jsonString, MetResponse.class);
+            MetResponse metResponse = gson.fromJson(jsonString, MetResponse.class);
 
             double progressIncrement = 1.0 / 50.0;
             int percentIncrement = 2;
@@ -146,7 +150,7 @@ public class MetPane extends HBox {
             for (int i = 0; i < 50 && i < metResponse.objectIDs.length; i++) {
                 loadMetArtInfo(metResponse.objectIDs[i]);
 
-                //Updates the progress bar each iteration of the loop.
+                //Updates the progress bar after each iteration of the loop.
                 Platform.runLater(
                     HelperMethods.createRunnableForProgressPane(
                         progressIncrement, percentIncrement, apiApp)
@@ -154,7 +158,13 @@ public class MetPane extends HBox {
             } //for
             System.out.println("First for loop finished");
 
-            updateArtPane();
+            //Adds the first image to the ArtPane's ImageView. Updates the ArtPane's Label so that
+            //it displays information about the artist and the piece.
+            updateArtPane(artArray);
+
+            //Updates the bottom buttons so that the previous piece and next piece buttons are
+            //visible and enabled.
+            Platform.runLater( () -> apiApp.bottomBtnBar.updateButtons(true, false, true));
         } catch (IOException | InterruptedException | IllegalArgumentException e) {
             Platform.runLater( () -> {
                 Alert alert = new Alert(AlertType.ERROR,
@@ -163,8 +173,8 @@ public class MetPane extends HBox {
             });
         } finally {
             Platform.runLater( () -> {
-                apiApp.progressPane.setProgress(0.0, 0);
-                apiApp.progressPane.progressPercent = 0;
+                apiApp.progressPane.resetProgress();
+                search.setDisable(false);
             });
         } //try
     } //searchForDepts
@@ -179,8 +189,8 @@ public class MetPane extends HBox {
         artArray.clear();
 
         Platform.runLater( () -> {
-            apiApp.artPane.artInfoPane.artInfo.setText("");
-            apiApp.artPane.artInfoPane.museumSearch.setVisible(false);
+            apiApp.artPane.artInfoPane.resetLabelsAndButtons();
+            apiApp.bottomBtnBar.resetButtons();
             apiApp.artPane.artView.setImage(null);
         });
     } //resetArt
@@ -211,7 +221,7 @@ public class MetPane extends HBox {
             /*
         case "Country/Region":
             String location = URLEncoder.encode(term, StandardCharsets.UTF_8);
-            return (url += "geoLocation=" + location + "&q=");
+            return (url += "geoLocation=" + location);
             */
         } //switch
 
@@ -261,11 +271,19 @@ public class MetPane extends HBox {
 
 
 
-    public void searchArtic(String term) {
+    /**
+     * Queries the Art Institute of Chicago's collection and populates an array of Art objects based
+     * on the results of the query.
+     */
+    public void searchArtic() {
         try {
             String url = "https://api.artic.edu/api/v1/artworks/search";
+            String term = apiApp.artPane.displayedPiece.artist;
             String q = URLEncoder.encode(term, StandardCharsets.UTF_8);
-            String query = "?q=" + q;
+            String query = "?q=" + q +
+                "&fields=id,title,artist_display,artist_title,gallery_title,place_of_origin,"
+                + "date_display,image_id";
+
             url = url + query;
             URI location = URI.create(url);
 
@@ -281,18 +299,20 @@ public class MetPane extends HBox {
 
             String jsonString = response.body();
 
-            System.out.println(jsonString);
-
             ArticResponse articResponse = gson
                 .fromJson(jsonString, ArticResponse.class);
 
-            /*
-            for (int i = 0; i < articResponse.results.length; i++) {
-                loadArticArtInfo(articResponse.results[i]);
+
+            for (int i = 0; i < 50 && i < articResponse.data.length; i++) {
+                loadArticArtInfo(articResponse.data[i]);
             } //for
-            */
 
-
+            Platform.runLater( () -> {
+                apiApp.artPane.artInfoPane.updateLabels(articArtArray, 0);
+                apiApp.artPane.artInfoPane.updateViewBtns(false, true);
+                apiApp.bottomBtnBar.updateButtons(true, true, false);
+            });
+            //updateArtPane(articArtArray);
         } catch (IOException | InterruptedException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         } //try
@@ -301,25 +321,31 @@ public class MetPane extends HBox {
 
 
     public void loadArticArtInfo(ArticResult articResult) {
-        System.out.println(articResult.title);
+        try {
+            String title = articResult.title;
+            String artist = articResult.artist_display;
+            String gallery = articResult.gallery_title;
+            String country = articResult.place_of_origin;
+            String period = articResult.date_display;
+
+            String imageUrl = "https://www.artic.edu/iiif/2/" + articResult.image_id +
+                "/full/843,/0/default.jpg";
+            Art artToAdd = new Art(title, artist, gallery, period, country, imageUrl);
+            articArtArray.add(artToAdd);
+        } catch (IllegalArgumentException e) {
+
+        } //try
     } //loadArticArtInfo
-
-
-
-    public void addToArrayList(String item, ArrayList<String> list) {
-        if (item != null && !item.isEmpty()) {
-            list.add(item);
-            System.out.println(item);
-        } //if
-    } //addToArrayList
 
 
 
     /**
      * Updates the GUI so it displays the first art piece whose image URL is not null. It then
      * displays the art's information (title, artist, time period, and department within the Met.
+     *
+     * @param artArray the Art arrayList to pull artist data from.
      */
-    public void updateArtPane() {
+    public void updateArtPane(ArrayList<Art> artArray) {
 
         //This loop finds the first image that is not null and displays it to the user, as well
         //as information about the artist.
@@ -331,7 +357,11 @@ public class MetPane extends HBox {
                 Platform.runLater( () -> {
                     apiApp.artPane.artView.setImage(artToDisplay.image);
 
-                    apiApp.artPane.artInfoPane.artInfo.setText(createArtInfo(artToDisplay));
+                    apiApp.artPane.artInfoPane.info1.setText("Title: " + artToDisplay.title);
+                    apiApp.artPane.artInfoPane.info2.setText("Artist: " + artToDisplay.artist);
+                    apiApp.artPane.artInfoPane.info3.setText("Period: " + artToDisplay.period);
+                    apiApp.artPane.artInfoPane.info4.setText(
+                        "Department: " + artToDisplay.department);
 
                     apiApp.artPane.artInfoPane.museumSearch.setVisible(true);
 
@@ -347,17 +377,13 @@ public class MetPane extends HBox {
      * This is a helper method that creates a String for the artInfoPane's info Label.
      * Returns a String of the Art's information (title, artist, period, and department).
      *
-     * @param art the Art object to generate the information String for.
-     * @return a String of the Art's information (title, artist, period, and department).
+     * @param art the Art object to retrieve information from.
      */
-    public String createArtInfo(Art art) {
-        String title = "Title: " + art.title;
-        String artist = "Artist: " + art.artist;
-        String period = "Period: " + art.period;
-        String department = "Department: " + art.department;
-        String info = title + "\n\n" + artist + "\n\n" + period + "\n\n" + department;
-
-        return info;
+    public void updateArtInfo(Art art) {
+        apiApp.artPane.artInfoPane.info1.setText("Title: " + art.title);
+        apiApp.artPane.artInfoPane.info2.setText("Artist: " + art.artist);
+        apiApp.artPane.artInfoPane.info3.setText("Period: " + art.period);
+        apiApp.artPane.artInfoPane.info4.setText("Department: " + art.department);
     } //createArtInfo
 
 
@@ -380,7 +406,7 @@ public class MetPane extends HBox {
         Art artToUpdateTo = artArray.get(index);
         apiApp.artPane.artView.setImage(artToUpdateTo.image);
         apiApp.artPane.setDisplayedPiece(artToUpdateTo);
-        apiApp.artPane.artInfoPane.artInfo.setText(createArtInfo(artToUpdateTo));
+        updateArtInfo(artToUpdateTo);
     } //nextArt
 
 
@@ -394,7 +420,7 @@ public class MetPane extends HBox {
 
             apiApp.artPane.artView.setImage(artToUpdateTo.image);
             apiApp.artPane.setDisplayedPiece(artToUpdateTo);
-            apiApp.artPane.artInfoPane.artInfo.setText(createArtInfo(artToUpdateTo));
+            updateArtInfo(artToUpdateTo);
 
             DISPLAYED_ART_INDEX -= 1;
             if (DISPLAYED_ART_INDEX == 0) {

@@ -23,11 +23,16 @@ import java.io.IOException;
  */
 public class ApiApp extends Application {
     Stage stage;
-    Scene scene;
-    VBox root;
+    Scene scene, articScene;
+    VBox root, articRoot;
+    // demonstrate how to load local asset using "file:resources/"
+    Image bannerImage = new Image("file:resources/readme-banner.png");
+    ImageView banner = new ImageView(bannerImage);
+
     MetPane metPane;
     ArtPane artPane;
     BottomButtonBar bottomBtnBar;
+    ArticPane articPane;
     public ProgressPane progressPane;
 
     /**
@@ -36,6 +41,7 @@ public class ApiApp extends Application {
      */
     public ApiApp() {
         root = new VBox();
+        articRoot = new VBox();
 
         metPane = new MetPane();
         metPane.apiApp = this;
@@ -46,6 +52,9 @@ public class ApiApp extends Application {
         bottomBtnBar.apiApp = this;
 
         progressPane = new ProgressPane();
+
+        articPane = new ArticPane();
+        createArticScene();
     } // ApiApp
 
 
@@ -78,19 +87,29 @@ public class ApiApp extends Application {
     } //loadMetImg
 
 
+    /**
+     * setup articScene that will be displayed to the user when they click the Search Art
+     * Institute of Chicago button.
+     */
+    public void createArticScene() {
+        // setup articScene that will be displayed to the user when they click the Search Art
+        // Institute of Chicago button.
+        articRoot.setSpacing(10);
+        articRoot.getChildren().addAll(banner, metPane, articPane, progressPane);
+        articScene = new Scene(articRoot);
+    } //createArticScene
+
+
     /** {@inheritDoc} */
     @Override
     public void start(Stage stage) {
 
         this.stage = stage;
 
-        // demonstrate how to load local asset using "file:resources/"
-        Image bannerImage = new Image("file:resources/readme-banner.png");
-        ImageView banner = new ImageView(bannerImage);
         //Image metMuseum = loadMetImg();
         //ImageView banner = new ImageView(metMuseum);
         banner.setPreserveRatio(true);
-        banner.setFitWidth(640);
+        banner.setFitWidth(720);
 
         // some labels to display information
         Label notice = new Label("Modify the starter code to suit your needs.");

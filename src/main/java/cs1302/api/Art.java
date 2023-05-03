@@ -52,6 +52,27 @@ public class Art {
 
 
     /**
+     * Creates an Art object for a Chicago Art Institute query.
+     * @param title the title of the piece.
+     * @param artist the artist who created the piece.
+     * @param department the department within the museum that the piece belongs to.
+     * @param period the time period that the piece was created in.
+     * @param country the country that the piece was created in.
+     * @param image an image of the piece.
+     */
+    public Art(String title, String artist, String department, String period, String country,
+        Image image) {
+        this.title = title;
+        this.artist = artist;
+        this.department = department;
+        this.period = period;
+        this.country = country;
+        this.image = image;
+    } //constructor
+
+
+
+    /**
      * Creates an image object of the art using the imageUrl.
      */
     private void loadImage() {
