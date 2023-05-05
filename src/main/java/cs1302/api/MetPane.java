@@ -308,7 +308,8 @@ public class MetPane extends HBox {
             } //for
 
             Platform.runLater( () -> {
-                apiApp.artPane.artInfoPane.updateLabels(articArtArray, 0);
+                //apiApp.artPane.artInfoPane.updateLabels(articArtArray, 0);
+                apiApp.articPane.updateArt(articArtArray, 0);
                 apiApp.artPane.artInfoPane.updateViewBtns(false, true);
                 apiApp.bottomBtnBar.updateButtons(true, true, false);
             });

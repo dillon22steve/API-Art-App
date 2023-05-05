@@ -86,13 +86,9 @@ public class ArtInfoPane extends VBox {
      */
     public void initBtnHandlers() {
         EventHandler<ActionEvent> searchHandler = (ActionEvent e) -> {
-            //search.setDisable(true);
-            //search.setVisible(false);
-            //HelperMethods.runNow( () -> apiApp.metPane.searchArtic());
-            System.out.println("Method entered.");
-            apiApp.stage.setScene(apiApp.articScene);
-            apiApp.stage.show();
-            System.out.println("Method ended.");
+            //apiApp.articPane.updateArt();
+            apiApp.metPane.searchArtic();
+            apiApp.switchScenes(false);
         };
 
         search.setOnAction(searchHandler);

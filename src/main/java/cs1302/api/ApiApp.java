@@ -25,6 +25,7 @@ public class ApiApp extends Application {
     Stage stage;
     Scene scene, articScene;
     VBox root, articRoot;
+
     // demonstrate how to load local asset using "file:resources/"
     Image bannerImage = new Image("file:resources/readme-banner.png");
     ImageView banner = new ImageView(bannerImage);
@@ -40,20 +41,20 @@ public class ApiApp extends Application {
      * constructor is executed in Step 2 of the JavaFX Application Life-Cycle.
      */
     public ApiApp() {
-        root = new VBox();
-        articRoot = new VBox();
+        this.root = new VBox();
+        this.articRoot = new VBox();
 
-        metPane = new MetPane();
-        metPane.apiApp = this;
+        this.metPane = new MetPane();
+        this.metPane.apiApp = this;
 
-        artPane = new ArtPane(this);
+        this.artPane = new ArtPane(this);
 
-        bottomBtnBar = new BottomButtonBar();
+        this.bottomBtnBar = new BottomButtonBar();
         bottomBtnBar.apiApp = this;
 
-        progressPane = new ProgressPane();
+        this.progressPane = new ProgressPane();
 
-        articPane = new ArticPane();
+        this.articPane = new ArticPane();
         createArticScene();
     } // ApiApp
 
@@ -95,15 +96,29 @@ public class ApiApp extends Application {
         // setup articScene that will be displayed to the user when they click the Search Art
         // Institute of Chicago button.
         articRoot.setSpacing(10);
-        articRoot.getChildren().addAll(banner, metPane, articPane, progressPane);
+        ImageView imgView = new ImageView(new Image("file:resources/readme-banner.png"));
+        imgView.setPreserveRatio(true);
+        imgView.setFitWidth(720);
+        articRoot.getChildren().addAll(imgView, new MetPane(), articPane);
         articScene = new Scene(articRoot);
     } //createArticScene
+
+
+    public void switchScenes(boolean isMainScene) {
+        if (isMainScene == true) {
+            stage.setScene(scene);
+            stage.show();
+        } else {
+            stage.setScene(articScene);
+            stage.sizeToScene();
+            stage.show();
+        } //if
+    } //switchScenes
 
 
     /** {@inheritDoc} */
     @Override
     public void start(Stage stage) {
-
         this.stage = stage;
 
         //Image metMuseum = loadMetImg();
