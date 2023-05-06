@@ -39,7 +39,7 @@ public class ApiApp extends Application {
     VBox root, articRoot;
 
     // demonstrate how to load local asset using "file:resources/"
-    Image bannerImage = new Image("file:resources/MetMuseum.jpg");
+    Image bannerImage = new Image("file:resources/art-museum-painting.png");
     ImageView banner = new ImageView(bannerImage);
     Label bannerInfo = new Label("The above image is the Metropolitan Museum of Art, found at "
         + "https://www.metmuseum.org/");
