@@ -9,6 +9,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.text.Font;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
@@ -19,7 +22,16 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
+ * This app allows the user to query the Metropolitan Museum of Art in New York City to find
+ * artworks based on their search parameters. It then displays the art along with information about
+ * the piece, including the title of the work, the name of the artist, the time period it was made,
+ * and the museum department that it belongs to. It then allows the user to search for works by the
+ * same artist at the Art Institute of Chicago (Artic). It uses the results from the Met query to
+ * search Artic for works by the same artist and then switches scenes so that the Artic results are
+ * displayed in a list format. The user can then click the view buttons to display the image of
+ * their choosing as well as information about the image, such as whether or not it is currently on
+ * display at Artic, the title, the artist, and the time period it was created in. The user can
+ * return back to the Met museum results at any time.
  */
 public class ApiApp extends Application {
     Stage stage;
@@ -27,8 +39,10 @@ public class ApiApp extends Application {
     VBox root, articRoot;
 
     // demonstrate how to load local asset using "file:resources/"
-    Image bannerImage = new Image("file:resources/readme-banner.png");
+    Image bannerImage = new Image("file:resources/MetMuseum.jpg");
     ImageView banner = new ImageView(bannerImage);
+    Label bannerInfo = new Label("The above image is the Metropolitan Museum of Art, found at "
+        + "https://www.metmuseum.org/");
 
     MetPane metPane;
     ArtPane artPane;
@@ -44,8 +58,7 @@ public class ApiApp extends Application {
         this.root = new VBox();
         this.articRoot = new VBox();
 
-        this.metPane = new MetPane();
-        this.metPane.apiApp = this;
+        this.metPane = new MetPane(this);
 
         this.artPane = new ArtPane(this);
 
@@ -67,10 +80,18 @@ public class ApiApp extends Application {
         // setup articScene that will be displayed to the user when they click the Search Art
         // Institute of Chicago button.
         articRoot.setSpacing(10);
-        ImageView imgView = new ImageView(new Image("file:resources/readme-banner.png"));
+        ImageView imgView = new ImageView(new Image("file:resources/ArtInstituteOfChicago.JPG"));
+        Label imgInfo = new Label("The above image is the Art Institute of Chicago, found at "
+            + "https://chicago.suntimes.com");
+        imgInfo.setFont(new Font("Book Antiqua", 11));
+
         imgView.setPreserveRatio(true);
         imgView.setFitWidth(720);
-        articRoot.getChildren().addAll(imgView, new MetPane(), articPane);
+        imgView.setFitHeight(300);
+
+        articRoot.setMargin(imgView, new Insets(0, 150, 0, 150));
+        articRoot.setAlignment(Pos.CENTER);
+        articRoot.getChildren().addAll(imgView, imgInfo, new MetPane(this), articPane);
         articScene = new Scene(articRoot);
     } //createArticScene
 
@@ -97,21 +118,20 @@ public class ApiApp extends Application {
     public void start(Stage stage) {
         this.stage = stage;
 
-        //Image metMuseum = loadMetImg();
-        //ImageView banner = new ImageView(metMuseum);
         banner.setPreserveRatio(true);
         banner.setFitWidth(720);
-
-        // some labels to display information
-        Label notice = new Label("Modify the starter code to suit your needs.");
+        banner.setFitHeight(300);
+        bannerInfo.setFont(new Font("Book Antiqua", 11));
 
         // setup scene
         root.setSpacing(10);
-        root.getChildren().addAll(banner, metPane, artPane, bottomBtnBar, progressPane);
+        root.setMargin(banner, new Insets(0, 20, 0, 20));
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(banner, bannerInfo, metPane, artPane, bottomBtnBar, progressPane);
         scene = new Scene(root);
 
         // setup stage
-        stage.setTitle("ApiApp!");
+        stage.setTitle("Art API App!");
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();

@@ -60,8 +60,11 @@ public class MetPane extends HBox {
 
     /**
      * Constructs a MetPane object.
+     * @param apiApp the ApiApp object that this pane belongs to.
      */
-    public MetPane() {
+    public MetPane(ApiApp apiApp) {
+        this.apiApp = apiApp;
+
         this.setSpacing(8);
         this.search = new Button("Search");
         this.searchBar = new TextField("Type an artist, or any other search term.");
@@ -99,9 +102,20 @@ public class MetPane extends HBox {
         EventHandler<ActionEvent> searchHandler = (ActionEvent e) -> {
             String term = searchBar.getText().trim();
             String filter = dropDown.getValue();
-            search.setDisable(true);
-            HelperMethods.runNow( () -> searchMet(term, filter));
-            //searchArtic();
+
+            //if the app is currently on the artic scene, the app switches scenes and updates the
+            //root scene's MetPane instead of the articScene's metPane.
+            if (apiApp.stage.getScene() != apiApp.scene) {
+                apiApp.articPane.resetPane();
+                apiApp.metPane.searchBar.setText(term);
+                apiApp.metPane.dropDown.setValue(filter);
+                apiApp.switchScenes(true);
+                apiApp.metPane.search.setDisable(true);
+                HelperMethods.runNow( () -> apiApp.metPane.searchMet(term, filter));
+            } else {
+                search.setDisable(true);
+                HelperMethods.runNow( () -> searchMet(term, filter));
+            }
         };
 
         search.setOnAction(searchHandler);
@@ -346,26 +360,18 @@ public class MetPane extends HBox {
      * @param artArray the Art arrayList to pull artist data from.
      */
     public void updateArtPane(ArrayList<Art> artArray) {
+        Art artToDisplay = artArray.get(0);
+        apiApp.artPane.setDisplayedPiece(artToDisplay);
 
-        //This loop finds the first image that is not null and displays it to the user, as well
-        //as information about the artist.
-        for (int i = 0; i < artArray.size(); i++) {
-            if (artArray.get(i).image != null) {
-                Art artToDisplay = artArray.get(i);
-                apiApp.artPane.setDisplayedPiece(artToDisplay);
+        Platform.runLater( () -> {
+            apiApp.artPane.artView.setImage(artToDisplay.image);
 
-                Platform.runLater( () -> {
-                    apiApp.artPane.artView.setImage(artToDisplay.image);
+            apiApp.artPane.artInfoPane.updateArtInfo(artToDisplay);
 
-                    apiApp.artPane.artInfoPane.updateArtInfo(artToDisplay);
+            apiApp.artPane.artInfoPane.museumSearch.setVisible(true);
 
-                    apiApp.artPane.artInfoPane.museumSearch.setVisible(true);
-
-                    apiApp.bottomBtnBar.nextBtn.setDisable(false);
-                });
-                break;
-            }
-        } //for
+            apiApp.bottomBtnBar.nextBtn.setDisable(false);
+        });
     } //updateArtPane
 
 

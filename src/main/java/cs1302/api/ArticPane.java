@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.paint.Color;
@@ -96,7 +97,7 @@ public class ArticPane extends HBox {
         previousPage = new Button("previous page");
         HelperMethods.updateButton(previousPage, true, true);
 
-        backToArticResults = new Button("back");
+        backToArticResults = new Button("Back");
         HelperMethods.updateButton(backToArticResults, true, false);
         backToMetResults = new Button("Return to Met Museum Results");
     } //initButtons
@@ -111,6 +112,8 @@ public class ArticPane extends HBox {
         view3.setOnAction(createViewHandler(2));
         view4.setOnAction(createViewHandler(3));
 
+        //When the user clicks previous page, the app displays the four previous results. If the new
+        //results are the first four, it disables the button to avoid an index out of bounds error.
         EventHandler<ActionEvent> prev = (ActionEvent e) -> {
             nextPage.setDisable(false);
             indexCurrentlyDisplayed = indexCurrentlyDisplayed - 4;
@@ -121,6 +124,8 @@ public class ArticPane extends HBox {
             } //if
         };
 
+        //When the user clicks next page, the app displays the next four results. If the new
+        //results are the last four, it disables the button to avoid an index out of bounds error.
         EventHandler<ActionEvent> next = (ActionEvent e) -> {
             previousPage.setDisable(false);
             indexCurrentlyDisplayed = indexCurrentlyDisplayed + 4;
@@ -131,6 +136,8 @@ public class ArticPane extends HBox {
             } //if
         };
 
+        //When the user clicks Back, it returns the app back to the list of different works by the
+        //artist and resets the view buttons so the user can view another piece.
         EventHandler<ActionEvent> backToArticHandler = (ActionEvent e) -> {
             artView.setImage(null);
             resetLabelProperties();
@@ -141,6 +148,8 @@ public class ArticPane extends HBox {
             nextPage.setVisible(true);
         };
 
+        //Returns the app back to the Met Museum scene where the user can continue viewing different
+        //works from their original query.
         EventHandler<ActionEvent> backToMetHandler = (ActionEvent e) -> {
             resetPane();
             apiApp.switchScenes(true);
@@ -198,7 +207,8 @@ public class ArticPane extends HBox {
     public void initBoxes() {
         artBox = new VBox(5);
         artBox.setMargin(artView, new Insets(0, 10, 0, 0));
-        artBox.setMargin(backToArticResults, new Insets(0, 0, 0, 50));
+        //artBox.setMargin(backToArticResults, new Insets(0, 0, 0, 50));
+        artBox.setAlignment(Pos.TOP_CENTER);
         artBox.getChildren().addAll(artView, backToArticResults);
 
         infoBox1 = new HBox(5);
@@ -227,7 +237,7 @@ public class ArticPane extends HBox {
 
 
     /**
-     * Updates the art array and the information displayed to the user.
+     * Updates the art array and the information that is displayed to the user.
      * @param art the Art objects that will be used to update the pane.
      * @param indexToStart the index to start in the art ArrayList.
      */
@@ -265,6 +275,16 @@ public class ArticPane extends HBox {
     /**
      * Resets the pane when the user returns to the Met Museum results so that the next time they
      * switch to the articScene it has the correct settings.
+     *
+     * Disables the previousPage button and makes it visible. Enables the nextPage button and
+     * makes it visible. Enables the view buttons and makes them visible, and disables the Back
+     * button and makes it invisible.
+     *
+     * Resets the artInfo Labels so they are not displaying any information, and resets the artView
+     * so it is not displaying any images. Also resets the properties of the artInfo labels so they
+     * have the correct font and text color.
+     *
+     * Removes the art from the results array.
      */
     public void resetPane() {
         articResults[0] = null;
