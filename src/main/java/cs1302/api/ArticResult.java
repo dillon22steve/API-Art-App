@@ -14,5 +14,6 @@ public class ArticResult {
     public String place_of_origin;
     public String date_display;
     public String image_id;
+    public boolean is_on_view;
 
 } //ArticResult

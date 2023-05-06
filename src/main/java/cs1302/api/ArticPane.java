@@ -1,5 +1,6 @@
 package cs1302.api;
 
+import cs1302.helpers.HelperMethods;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import javafx.scene.layout.HBox;
@@ -12,6 +13,8 @@ import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 
 /**
@@ -24,6 +27,8 @@ public class ArticPane extends HBox {
     //displays the piece to the user after they click a view button.
     public VBox artInfoBox, artBox;
 
+    private ApiApp apiApp;
+
     public HBox infoBox1, infoBox2, infoBox3, infoBox4;
     public HBox buttonBox;
     public Label artInfo1, artInfo2, artInfo3, artInfo4;
@@ -31,13 +36,19 @@ public class ArticPane extends HBox {
     public Button nextPage, previousPage;
     public Button backToArticResults, backToMetResults;
     public Art[] articResults = new Art[4];
+    public int indexCurrentlyDisplayed = 0;
 
     public ImageView artView;
 
+    private static Font DEFAULT_FONT = new Font("Book Antiqua", 13);
+
     /**
      * Constructs an ArticPane object.
+     * @param apiApp the application that this ArticPane object was added to.
      */
-    public ArticPane() {
+    public ArticPane(ApiApp apiApp) {
+        this.apiApp = apiApp;
+
         this.artView = new ImageView();
         this.artView.setFitWidth(300);
         this.artView.setFitHeight(300);
@@ -56,19 +67,19 @@ public class ArticPane extends HBox {
     public void initInfoLabels() {
         artInfo1 = new Label("");
         artInfo1.setWrapText(true);
-        artInfo1.setFont(new Font("Book Antiqua", 13));
+        artInfo1.setFont(DEFAULT_FONT);
 
         artInfo2 = new Label("");
         artInfo2.setWrapText(true);
-        artInfo2.setFont(new Font("Book Antiqua", 13));
+        artInfo2.setFont(DEFAULT_FONT);
 
         artInfo3 = new Label("");
         artInfo3.setWrapText(true);
-        artInfo3.setFont(new Font("Book Antiqua", 13));
+        artInfo3.setFont(DEFAULT_FONT);
 
         artInfo4 = new Label("");
         artInfo4.setWrapText(true);
-        artInfo4.setFont(new Font("Book Antiqua", 13));
+        artInfo4.setFont(DEFAULT_FONT);
     } //initInfoLabels
 
 
@@ -83,10 +94,10 @@ public class ArticPane extends HBox {
 
         nextPage = new Button("next page");
         previousPage = new Button("previous page");
+        HelperMethods.updateButton(previousPage, true, true);
 
         backToArticResults = new Button("back");
-        backToArticResults.setVisible(false);
-        backToArticResults.setDisable(true);
+        HelperMethods.updateButton(backToArticResults, true, false);
         backToMetResults = new Button("Return to Met Museum Results");
     } //initButtons
 
@@ -99,11 +110,53 @@ public class ArticPane extends HBox {
         view2.setOnAction(createViewHandler(1));
         view3.setOnAction(createViewHandler(2));
         view4.setOnAction(createViewHandler(3));
+
+        EventHandler<ActionEvent> prev = (ActionEvent e) -> {
+            nextPage.setDisable(false);
+            indexCurrentlyDisplayed = indexCurrentlyDisplayed - 4;
+            updateArt(apiApp.metPane.articArtArray, indexCurrentlyDisplayed);
+
+            if (indexCurrentlyDisplayed == 0) {
+                previousPage.setDisable(true);
+            } //if
+        };
+
+        EventHandler<ActionEvent> next = (ActionEvent e) -> {
+            previousPage.setDisable(false);
+            indexCurrentlyDisplayed = indexCurrentlyDisplayed + 4;
+            updateArt(apiApp.metPane.articArtArray, indexCurrentlyDisplayed);
+
+            if (indexCurrentlyDisplayed == 8) {
+                nextPage.setDisable(true);
+            } //if
+        };
+
+        EventHandler<ActionEvent> backToArticHandler = (ActionEvent e) -> {
+            artView.setImage(null);
+            resetLabelProperties();
+            updateArt(apiApp.metPane.articArtArray, indexCurrentlyDisplayed);
+            HelperMethods.updateButton(backToArticResults, true, false);
+            HelperMethods.updateButtons(view1, view2, view3, view4, false, true);
+            previousPage.setVisible(true);
+            nextPage.setVisible(true);
+        };
+
+        EventHandler<ActionEvent> backToMetHandler = (ActionEvent e) -> {
+            resetPane();
+            apiApp.switchScenes(true);
+        };
+
+        previousPage.setOnAction(prev);
+        nextPage.setOnAction(next);
+        backToArticResults.setOnAction(backToArticHandler);
+        backToMetResults.setOnAction(backToMetHandler);
     } //initHandlers
 
 
     /**
-     * This is a helper method that creates an EventHandler for the pane's view buttons.
+     * This is a helper method that creates an EventHandler for the pane's view buttons. When the
+     * user clicks view, it displays the art's image and changes the labels to display more detailed
+     * information about the piece.
      * @param artIndex the index to retrieve the Art object from the pane's art array.
      * @return an EventHandler that will display the art and it's info to the user when a view
      * button is clicked.
@@ -112,12 +165,26 @@ public class ArticPane extends HBox {
         EventHandler<ActionEvent> handler = (ActionEvent e) -> {
             Art artToUpdate = articResults[artIndex];
             artView.setImage(artToUpdate.image);
-            artInfo1.setText("\"" + artToUpdate.title + "\"");
-            artInfo2.setText("By: " + artToUpdate.artist);
-            artInfo3.setText(artToUpdate.period);
-            artInfo4.setText(artToUpdate.department);
 
-            updateViewBtns(true, false);
+            //The text for artInfo1 appears green if the piece is currently on display at the Art
+            //Institute of Chicago. The text appears red if it is not on display.
+            artInfo1.setText(artToUpdate.isOnDisplay);
+            artInfo1.setFont(new Font("Book Antiqua", 15));
+            artInfo1.setTextFill(HelperMethods.createTextFillColor(artToUpdate.isOnDisplay));
+
+            artInfo2.setFont(new Font("Book Antiqua", 15));
+            artInfo2.setText("\"" + artToUpdate.title + "\"");
+            artInfo3.setFont(new Font("Book Antiqua", 15));
+            artInfo3.setText("By: " + artToUpdate.artist);
+            artInfo4.setFont(new Font("Book Antiqua", 15));
+            artInfo4.setText("Period: " + artToUpdate.period);
+
+            //enables the back button which will allow the user to return to the list of artworks.
+            //Renders the view, previous page and next page buttons invisible to the user.
+            HelperMethods.updateButton(backToArticResults, false, true);
+            previousPage.setVisible(false);
+            nextPage.setVisible(false);
+            HelperMethods.updateButtons(view1, view2, view3, view4, true, false);
         };
 
         return handler;
@@ -130,6 +197,8 @@ public class ArticPane extends HBox {
      */
     public void initBoxes() {
         artBox = new VBox(5);
+        artBox.setMargin(artView, new Insets(0, 10, 0, 0));
+        artBox.setMargin(backToArticResults, new Insets(0, 0, 0, 50));
         artBox.getChildren().addAll(artView, backToArticResults);
 
         infoBox1 = new HBox(5);
@@ -182,18 +251,38 @@ public class ArticPane extends HBox {
 
 
     /**
-     * Updates the disable and visible values of the pane's view buttons.
-     * @param disable the boolean value to set the buttons' disabled values.
-     * @param visible the boolean value to set the buttons' visible values.
+     * Resets the artInfo Label properties back to their original Font size and color.
      */
-    public void updateViewBtns(boolean disable, boolean visible) {
-        view1.setDisable(disable);
-        view1.setVisible(visible);
-        view2.setDisable(disable);
-        view2.setVisible(visible);
-        view3.setDisable(disable);
-        view3.setVisible(visible);
-        view4.setDisable(disable);
-        view4.setVisible(visible);
-    } //updateBiewBtns
+    public void resetLabelProperties() {
+        artInfo1.setFont(DEFAULT_FONT);
+        artInfo1.setTextFill(Color.web("0x000000ff"));
+        artInfo2.setFont(DEFAULT_FONT);
+        artInfo3.setFont(DEFAULT_FONT);
+        artInfo4.setFont(DEFAULT_FONT);
+    } //resetLabelProperties
+
+
+    /**
+     * Resets the pane when the user returns to the Met Museum results so that the next time they
+     * switch to the articScene it has the correct settings.
+     */
+    public void resetPane() {
+        articResults[0] = null;
+        articResults[1] = null;
+        articResults[2] = null;
+        articResults[3] = null;
+
+        resetLabelProperties();
+        artInfo1.setText("");
+        artInfo2.setText("");
+        artInfo3.setText("");
+        artInfo4.setText("");
+
+        artView.setImage(null);
+
+        HelperMethods.updateButton(previousPage, true, true);
+        HelperMethods.updateButton(nextPage, false, true);
+        HelperMethods.updateButtons(view1, view2, view3, view4, false, true);
+        HelperMethods.updateButton(backToArticResults, true, false);
+    } //resetPane
 } //ArticPane

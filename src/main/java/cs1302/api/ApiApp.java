@@ -54,38 +54,9 @@ public class ApiApp extends Application {
 
         this.progressPane = new ProgressPane();
 
-        this.articPane = new ArticPane();
+        this.articPane = new ArticPane(this);
         createArticScene();
     } // ApiApp
-
-
-    /**
-     * Loads an image of the Met Museum in New York City to be displayed at the top of the app.
-     * @return an image of the Met Museum in New York City to be displayed at the top of the app.
-     */
-    public Image loadMetImg() {
-        try {
-            String url = "https://www.metmuseum.org/-/media/images/visit/plan-your-visit/individual"
-                + "-locations/fifth-avenue/fifthave_1520x1520.jpg?as=1&mh=3040&mw=3040&sc_"
-                + "lang=en&hash=BFF78F8B47EA58D354A9FE842B717611";
-
-            URI location = URI.create(url);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(location)
-                .build();
-
-            HttpResponse<InputStream> response = MetPane.HTTP_CLIENT.send(request,
-                BodyHandlers.ofInputStream());
-
-            InputStream imageStream = response.body();
-            Image metMuseum = new Image(imageStream);
-            return metMuseum;
-        } catch (IOException | InterruptedException | IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        } //try
-        return new Image("file:resources/readme-banner.png");
-    } //loadMetImg
 
 
     /**
@@ -104,6 +75,11 @@ public class ApiApp extends Application {
     } //createArticScene
 
 
+    /**
+     * Switches the app's scene to the main scene if the isMainScene value is true, switches to the
+     * articScene otherwise.
+     * @param isMainScene the boolean value that determines which scene the app will switch to.
+     */
     public void switchScenes(boolean isMainScene) {
         if (isMainScene == true) {
             stage.setScene(scene);

@@ -1,5 +1,6 @@
 package cs1302.api;
 
+import cs1302.helpers.*;
 import javafx.scene.image.Image;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -22,6 +23,7 @@ public class Art {
     public String period;
     public String country;
     public String imageUrl;
+    public String isOnDisplay;
     public Image image;
 
     /**
@@ -34,6 +36,7 @@ public class Art {
      * @param period the time period that the piece was created in.
      * @param country the country that the piece was created in.
      * @param imageUrl the url for the image that will be used to created an Image object of the
+     * piece.
      */
     public Art(String title, String artist, String department, String period, String country,
         String imageUrl) {
@@ -43,7 +46,7 @@ public class Art {
         this.department = department;
         this.period = period;
 
-        if (imageUrl != null && !(imageUrl.isEmpty())) {
+        if (imageUrl != null) {
             this.imageUrl = imageUrl;
             loadImage();
         } //if
@@ -58,16 +61,28 @@ public class Art {
      * @param department the department within the museum that the piece belongs to.
      * @param period the time period that the piece was created in.
      * @param country the country that the piece was created in.
-     * @param image an image of the piece.
+     * @param imageUrl the url for the image that will be used to created an Image object of the
+     * piece.
+     * @param isOnDisplay a boolean value that determines if the art is currently on display.
      */
     public Art(String title, String artist, String department, String period, String country,
-        Image image) {
+        String imageUrl, boolean isOnDisplay) {
         this.title = title;
         this.artist = artist;
         this.department = department;
         this.period = period;
         this.country = country;
-        this.image = image;
+
+        if (isOnDisplay == true) {
+            this.isOnDisplay = "Currently on display";
+        } else {
+            this.isOnDisplay = "Not currently on display";
+        } //if
+
+        if (imageUrl != null) {
+            this.imageUrl = imageUrl;
+            loadImage();
+        } //if
     } //constructor
 
 
@@ -88,7 +103,7 @@ public class Art {
             InputStream imageStream = response.body();
             image = new Image(imageStream);
         } catch (IOException | InterruptedException | IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            HelperMethods.throwAlert(e.getMessage());
         } //try
     } //loadImage
 } //Art

@@ -1,6 +1,7 @@
 package cs1302.api;
 
 
+import cs1302.helpers.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.event.EventHandler;
@@ -22,11 +23,10 @@ public class BottomButtonBar extends HBox {
      */
     public BottomButtonBar() {
         this.previousBtn = new Button("Previous Piece");
-        previousBtn.setDisable(true);
-        previousBtn.setVisible(false);
+        HelperMethods.updateButton(previousBtn, true, false);
+
         this.nextBtn = new Button("Next Piece");
-        nextBtn.setVisible(false);
-        nextBtn.setDisable(true);
+        HelperMethods.updateButton(nextBtn, true, false);
 
         initHandlers();
 
