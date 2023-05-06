@@ -1,6 +1,9 @@
 package cs1302.api;
 
 
+/**
+ * Represents a result from a query of the Met Museum via Object ID.
+ */
 public class ObjectResult {
 
     public String primaryImage;

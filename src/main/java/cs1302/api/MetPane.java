@@ -337,13 +337,13 @@ public class MetPane extends HBox {
     public void loadArticArtInfo(ArticResult articResult) {
         try {
             String title = articResult.title;
-            String artist = articResult.artist_display;
-            String gallery = articResult.gallery_title;
-            String country = articResult.place_of_origin;
-            String period = articResult.date_display;
-            boolean isOnDisplay = articResult.is_on_view;
+            String artist = articResult.artistDisplay;
+            String gallery = articResult.gallery;
+            String country = articResult.country;
+            String period = articResult.period;
+            boolean isOnDisplay = articResult.isOnView;
 
-            String imageUrl = "https://www.artic.edu/iiif/2/" + articResult.image_id +
+            String imageUrl = "https://www.artic.edu/iiif/2/" + articResult.imageId +
                 "/full/843,/0/default.jpg";
             Art artToAdd = new Art(title, artist, gallery, period, country, imageUrl, isOnDisplay);
             articArtArray.add(artToAdd);
