@@ -41,8 +41,6 @@ public class ApiApp extends Application {
     // demonstrate how to load local asset using "file:resources/"
     Image bannerImage = new Image("file:resources/art-museum-painting.png");
     ImageView banner = new ImageView(bannerImage);
-    Label bannerInfo = new Label("The above image is the Metropolitan Museum of Art, found at "
-        + "https://www.metmuseum.org/");
 
     MetPane metPane;
     ArtPane artPane;
@@ -80,18 +78,14 @@ public class ApiApp extends Application {
         // setup articScene that will be displayed to the user when they click the Search Art
         // Institute of Chicago button.
         articRoot.setSpacing(10);
-        ImageView imgView = new ImageView(new Image("file:resources/ArtInstituteOfChicago.JPG"));
-        Label imgInfo = new Label("The above image is the Art Institute of Chicago, found at "
-            + "https://chicago.suntimes.com");
-        imgInfo.setFont(new Font("Book Antiqua", 11));
+        ImageView imgView = new ImageView(new Image("file:resources/art-museum-painting.png"));
 
-        imgView.setPreserveRatio(true);
-        imgView.setFitWidth(720);
+        imgView.setFitWidth(640);
         imgView.setFitHeight(300);
 
-        articRoot.setMargin(imgView, new Insets(0, 150, 0, 150));
+        articRoot.setMargin(imgView, new Insets(0, 50, 0, 50));
         articRoot.setAlignment(Pos.CENTER);
-        articRoot.getChildren().addAll(imgView, imgInfo, new MetPane(this), articPane);
+        articRoot.getChildren().addAll(imgView, new MetPane(this), articPane);
         articScene = new Scene(articRoot);
     } //createArticScene
 
@@ -107,7 +101,7 @@ public class ApiApp extends Application {
             stage.show();
         } else {
             stage.setScene(articScene);
-            stage.sizeToScene();
+            //stage.sizeToScene();
             stage.show();
         } //if
     } //switchScenes
@@ -118,16 +112,14 @@ public class ApiApp extends Application {
     public void start(Stage stage) {
         this.stage = stage;
 
-        banner.setPreserveRatio(true);
-        banner.setFitWidth(720);
+        banner.setFitWidth(640);
         banner.setFitHeight(300);
-        bannerInfo.setFont(new Font("Book Antiqua", 11));
 
         // setup scene
         root.setSpacing(10);
-        root.setMargin(banner, new Insets(0, 20, 0, 20));
+        root.setMargin(banner, new Insets(0, 50, 0, 50));
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(banner, bannerInfo, metPane, artPane, bottomBtnBar, progressPane);
+        root.getChildren().addAll(banner, metPane, artPane, bottomBtnBar, progressPane);
         scene = new Scene(root);
 
         // setup stage

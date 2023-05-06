@@ -226,7 +226,8 @@ public class ArticPane extends HBox {
         artInfoBox = new VBox(30);
         artInfoBox.setMinWidth(300);
         artInfoBox.setMinHeight(400);
-        artInfoBox.setMargin(backToMetResults, new Insets(0, 0, 0, 230));
+        artInfoBox.setMargin(backToMetResults, new Insets(5, 0, 0, 230));
+        backToMetResults.setAlignment(Pos.BOTTOM_CENTER);
         artInfoBox.getChildren().addAll(infoBox1, infoBox2, infoBox3, infoBox4,
             buttonBox, backToMetResults);
 

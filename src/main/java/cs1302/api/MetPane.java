@@ -1,6 +1,7 @@
 package cs1302.api;
 
 import cs1302.helpers.*;
+import cs1302.results.*;
 import java.util.ArrayList;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
