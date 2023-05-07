@@ -151,6 +151,9 @@ public class MetPane extends HBox {
 
             String jsonString = response.body();
             MetResponse metResponse = gson.fromJson(jsonString, MetResponse.class);
+            if (metResponse.objectIDs == null) {
+                throw new IOException("The query did not return any results.");
+            } //if
 
             double progressIncrement =
                 HelperMethods.calculateIncrement(metResponse.objectIDs.length);
@@ -314,7 +317,6 @@ public class MetPane extends HBox {
             ArticResponse articResponse = gson
                 .fromJson(jsonString, ArticResponse.class);
 
-
             for (int i = 0; i < 50 && i < articResponse.data.length; i++) {
                 loadArticArtInfo(articResponse.data[i]);
             } //for
@@ -391,22 +393,27 @@ public class MetPane extends HBox {
      * Updates the ArtPane so that the next Art object in the artArray is displayed to the user.
      */
     public void nextArt() {
-        apiApp.bottomBtnBar.previousBtn.setDisable(false);
-        int index = DISPLAYED_ART_INDEX + 1;
+        try {
+            apiApp.bottomBtnBar.previousBtn.setDisable(false);
+            int index = DISPLAYED_ART_INDEX + 1;
 
-        if (DISPLAYED_ART_INDEX < artArray.size()) {
-            DISPLAYED_ART_INDEX += 1;
-            if (DISPLAYED_ART_INDEX == artArray.size()) {
-                apiApp.bottomBtnBar.nextBtn.setDisable(true);
-            } else {
-                apiApp.bottomBtnBar.nextBtn.setDisable(false);
+            if (DISPLAYED_ART_INDEX < artArray.size()) {
+                DISPLAYED_ART_INDEX += 1;
+                if (DISPLAYED_ART_INDEX == artArray.size() - 1) {
+                    apiApp.bottomBtnBar.nextBtn.setDisable(true);
+                } else {
+                    apiApp.bottomBtnBar.nextBtn.setDisable(false);
+                } //if
             } //if
-        } //if
 
-        Art artToUpdateTo = artArray.get(index);
-        apiApp.artPane.artView.setImage(artToUpdateTo.image);
-        apiApp.artPane.setDisplayedPiece(artToUpdateTo);
-        updateArtInfo(artToUpdateTo);
+            Art artToUpdateTo = artArray.get(index);
+            apiApp.artPane.artView.setImage(artToUpdateTo.image);
+            apiApp.artPane.setDisplayedPiece(artToUpdateTo);
+            updateArtInfo(artToUpdateTo);
+        } catch (IndexOutOfBoundsException e) {
+            String errMessage = "There are no more pieces to display.";
+            HelperMethods.throwAlert(errMessage);
+        } //try
     } //nextArt
 
 
@@ -414,20 +421,25 @@ public class MetPane extends HBox {
      * Updates the ArtPane so that the previous Art object in the artArray is displayed to the user.
      */
     public void previousArt() {
-        if (DISPLAYED_ART_INDEX > 0) {
-            int index = DISPLAYED_ART_INDEX - 1;
-            Art artToUpdateTo = artArray.get(index);
+        try {
+            if (DISPLAYED_ART_INDEX > 0) {
+                int index = DISPLAYED_ART_INDEX - 1;
+                Art artToUpdateTo = artArray.get(index);
 
-            apiApp.artPane.artView.setImage(artToUpdateTo.image);
-            apiApp.artPane.setDisplayedPiece(artToUpdateTo);
-            updateArtInfo(artToUpdateTo);
+                apiApp.artPane.artView.setImage(artToUpdateTo.image);
+                apiApp.artPane.setDisplayedPiece(artToUpdateTo);
+                updateArtInfo(artToUpdateTo);
 
-            DISPLAYED_ART_INDEX -= 1;
-            if (DISPLAYED_ART_INDEX == 0) {
-                apiApp.bottomBtnBar.previousBtn.setDisable(true);
-            } else {
-                apiApp.bottomBtnBar.previousBtn.setDisable(false);
+                DISPLAYED_ART_INDEX -= 1;
+                if (DISPLAYED_ART_INDEX == 0) {
+                    apiApp.bottomBtnBar.previousBtn.setDisable(true);
+                } else {
+                    apiApp.bottomBtnBar.previousBtn.setDisable(false);
+                } //if
             } //if
-        } //if
+        } catch (IndexOutOfBoundsException e) {
+            String errMessage = "There is not another piece before this one.";
+            HelperMethods.throwAlert(errMessage);
+        } //try
     } //previousArt
 } //MetPane

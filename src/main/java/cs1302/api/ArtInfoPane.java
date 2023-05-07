@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.layout.Priority;
+import javafx.application.Platform;
 
 
 /**
@@ -69,8 +70,10 @@ public class ArtInfoPane extends VBox {
      */
     public void initBtnHandlers() {
         EventHandler<ActionEvent> searchHandler = (ActionEvent e) -> {
-            apiApp.metPane.searchArtic();
-            apiApp.switchScenes(false);
+            HelperMethods.runNow( () -> {
+                apiApp.metPane.searchArtic();
+                Platform.runLater( () -> apiApp.switchScenes(false));
+            });
         };
 
         search.setOnAction(searchHandler);
