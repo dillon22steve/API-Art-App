@@ -1,5 +1,6 @@
 package cs1302.api;
 
+import cs1302.api.art.Art;
 import cs1302.helpers.HelperMethods;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
@@ -8,14 +9,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 
 /**

@@ -1,6 +1,7 @@
-package cs1302.api;
+package cs1302.api.art;
 
 
+import cs1302.api.ApiApp;
 import cs1302.helpers.*;
 import java.util.ArrayList;
 import javafx.scene.layout.VBox;
@@ -71,7 +72,7 @@ public class ArtInfoPane extends VBox {
     public void initBtnHandlers() {
         EventHandler<ActionEvent> searchHandler = (ActionEvent e) -> {
             HelperMethods.runNow( () -> {
-                apiApp.metPane.searchArtic();
+                apiApp.getMetPane().searchArtic();
                 Platform.runLater( () -> apiApp.switchScenes(false));
             });
         };

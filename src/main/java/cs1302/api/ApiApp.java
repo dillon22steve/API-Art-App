@@ -18,6 +18,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest.Builder;
 import java.net.URI;
 import java.net.http.HttpResponse.BodyHandlers;
+
+import cs1302.api.art.ArtPane;
+
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -130,5 +133,10 @@ public class ApiApp extends Application {
         stage.show();
 
     } // start
+
+
+    public MetPane getMetPane() {
+        return this.metPane;
+    } //getMetPane
 
 } // ApiApp

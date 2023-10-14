@@ -1,7 +1,7 @@
 package cs1302.api;
 
+import cs1302.api.art.Art;
 import cs1302.helpers.*;
-import cs1302.results.*;
 import java.util.ArrayList;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -9,25 +9,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
-import javafx.scene.image.Image;
 import javafx.geometry.Insets;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import java.io.IOException;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest.Builder;
 import java.net.URI;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.nio.charset.StandardCharsets;
 import java.net.URLEncoder;
-import java.io.InputStream;
 
 
 /**
@@ -203,10 +198,10 @@ public class MetPane extends HBox {
         artArray.clear();
 
         Platform.runLater( () -> {
-            apiApp.artPane.artInfoPane.resetArtInfo();
-            apiApp.artPane.artInfoPane.museumSearch.setVisible(false);
+            apiApp.artPane.getArtInfoPane().resetArtInfo();
+            apiApp.artPane.getArtInfoPane().museumSearch.setVisible(false);
             apiApp.bottomBtnBar.resetButtons();
-            apiApp.artPane.artView.setImage(null);
+            apiApp.artPane.getArtView().setImage(null);
         });
     } //resetArt
 
@@ -293,7 +288,7 @@ public class MetPane extends HBox {
 
         try {
             String url = "https://api.artic.edu/api/v1/artworks/search";
-            String term = apiApp.artPane.displayedPiece.artist;
+            String term = apiApp.artPane.getDisplayedPiece().artist;
             String q = URLEncoder.encode(term, StandardCharsets.UTF_8);
             String query = "?q=" + q +
                 "&fields=id,title,artist_display,artist_title,gallery_title,place_of_origin,"
@@ -367,11 +362,11 @@ public class MetPane extends HBox {
         apiApp.artPane.setDisplayedPiece(artToDisplay);
 
         Platform.runLater( () -> {
-            apiApp.artPane.artView.setImage(artToDisplay.image);
+            apiApp.artPane.getArtView().setImage(artToDisplay.image);
 
-            apiApp.artPane.artInfoPane.updateArtInfo(artToDisplay);
+            apiApp.artPane.getArtInfoPane().updateArtInfo(artToDisplay);
 
-            apiApp.artPane.artInfoPane.museumSearch.setVisible(true);
+            apiApp.artPane.getArtInfoPane().museumSearch.setVisible(true);
 
             apiApp.bottomBtnBar.nextBtn.setDisable(false);
         });
@@ -385,7 +380,7 @@ public class MetPane extends HBox {
      * @param art the Art object to retrieve information from.
      */
     public void updateArtInfo(Art art) {
-        apiApp.artPane.artInfoPane.updateArtInfo(art);
+        apiApp.artPane.getArtInfoPane().updateArtInfo(art);
     } //createArtInfo
 
 
@@ -407,7 +402,7 @@ public class MetPane extends HBox {
             } //if
 
             Art artToUpdateTo = artArray.get(index);
-            apiApp.artPane.artView.setImage(artToUpdateTo.image);
+            apiApp.artPane.getArtView().setImage(artToUpdateTo.image);
             apiApp.artPane.setDisplayedPiece(artToUpdateTo);
             updateArtInfo(artToUpdateTo);
         } catch (IndexOutOfBoundsException e) {
@@ -426,7 +421,7 @@ public class MetPane extends HBox {
                 int index = DISPLAYED_ART_INDEX - 1;
                 Art artToUpdateTo = artArray.get(index);
 
-                apiApp.artPane.artView.setImage(artToUpdateTo.image);
+                apiApp.artPane.getArtView().setImage(artToUpdateTo.image);
                 apiApp.artPane.setDisplayedPiece(artToUpdateTo);
                 updateArtInfo(artToUpdateTo);
 

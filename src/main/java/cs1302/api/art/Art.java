@@ -1,11 +1,10 @@
-package cs1302.api;
+package cs1302.api.art;
 
+import cs1302.api.MetPane;
 import cs1302.helpers.*;
 import javafx.scene.image.Image;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest.Builder;
 import java.net.URI;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.io.InputStream;

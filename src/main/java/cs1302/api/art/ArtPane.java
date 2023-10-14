@@ -1,10 +1,11 @@
-package cs1302.api;
+package cs1302.api.art;
 
 
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import cs1302.api.ApiApp;
 import javafx.geometry.Insets;
 
 
@@ -64,5 +65,50 @@ public class ArtPane extends HBox {
     public void setDisplayedPiece(Art piece) {
         this.displayedPiece = piece;
     } //setDisplayedPiece
+
+
+    /**
+     * Returns the piece currently displayed.
+     * @return the piece currently displayed.
+     */
+    public Art getDisplayedPiece() {
+        return displayedPiece;
+    } //getDisplayedPiece
+
+
+    /**
+     * Returns the artView object for this pane.
+     * @return the artView object for this pane.
+     */
+    public ImageView getArtView() {
+        return artView;
+    } //getArtView
+
+
+    /**
+     * Sets the artView object for this pane.
+     * @param artView the artView object to set for this pane.
+     */
+    public void setArtView(ImageView artView) {
+        this.artView = artView;
+    } //setArtView
+
+
+    /**
+     * Returns the artInfoPane object for this pane.
+     * @return the artInfoPane object for this pane.
+     */
+    public ArtInfoPane getArtInfoPane() {
+        return artInfoPane;
+    } //getArtInfoPane
+
+
+    /**
+     * Sets the artInfoPane object for this pane.
+     * @param artInfoPane the artInfoPane object to set for this pane.
+     */
+    public void setArtInfoPane(ArtInfoPane artInfoPane) {
+        this.artInfoPane = artInfoPane;
+    } //setArtInfoPane
 
 } //ArtPane
